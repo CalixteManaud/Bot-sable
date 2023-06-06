@@ -11,7 +11,7 @@ client.on('ready', async() => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('messageReactionAdd', async (reaction, user) => {
+client.on('messageReactionAdd', async (reaction) => {
     if (reaction.message.guild.id === targetGuildId && reaction.message.channel.id === targetChannelId) {
         if (targetEmojis.includes(reaction.emoji.name)) {
             console.log(`Emoji réagi dans le salon spécifié : ${reaction.emoji.name}`);
@@ -27,7 +27,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 });
 
-client.login(config.token);
+client.login(config.token).then(r => console.log(`Logged in as ${client.user.tag}!`)).catch(console.error);
 
 const rl = readline.createInterface({
     input: process.stdin,
