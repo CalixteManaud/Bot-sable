@@ -22,7 +22,7 @@ client.on('messageCreate', async (message) => {
 
             if (urls) {
                 for (const url of urls) {
-                    if (isImageUrl(url)) {
+                    if (await isImageUrl(url)) {
                         hasImage = true;
                         break;
                     }
@@ -38,56 +38,32 @@ client.on('messageCreate', async (message) => {
                 const response = await axios.get('https://api.sightengine.com/1.0/check-workflow.json', {
                     params: {
                         'url': url,
-                        'workflow': 'wfl_edZJCSSIo1nRmhugC1P76',
-                        'api_user': '122218943',
-                        'api_secret': '7hX32MyuZsqBC3AP9WBQ',
+                        'workflow': config.work,
+                        'api_user': config.apiUser,
+                        'api_secret': config.apiSecret,
                     }
                 });
 
-                console.log(response.data);
+                if (response.data.summary.action === 'reject'){
+                    message.delete().catch(console.error);
+                    console.log(`Message supprimé : ${message.content}`);
+                }
+
                 // Faites ici ce que vous voulez faire avec la réponse de l'API Sightengine
 
             } catch (error) {
                 if (error.response) console.log(error.response.data);
                 else console.log(error.message);
             }
-        } else {
-            console.log("Pas d'image");
         }
     }
 });
 
-function isImageUrl(url) {
+async function isImageUrl(url) {
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
     const urlLower = url.toLowerCase();
 
     return imageExtensions.some(extension => urlLower.endsWith(extension));
-}
-
-
-async function detectExplicitContent(imageUrl) {
-    try {
-        const response = await axios.get('https://api.sightengine.com/1.0/check.json', {
-            params: {
-                'url': imageUrl,
-                'workflow': 'wfl_ee1GlKYsAC3bRRNI4P4nR',
-                'api_user': '122218943',
-                'api_secret': '7hX32MyuZsqBC3AP9WBQ',
-            },
-        }).then(function (response) {
-            // on success: handle response
-            console.log(response.data);
-        })
-            .catch(function (error) {
-                // handle error
-                if (error.response) console.log(error.response.data);
-                else console.log(error.message);
-            });
-
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
 }
 
 client.login(config.token);
